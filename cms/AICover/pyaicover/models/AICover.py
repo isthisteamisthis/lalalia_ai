@@ -294,9 +294,8 @@ sr_dict = {"32k": 32000, "40k": 40000, "48k": 48000}
 
 def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, background_path):
     # 보컬 합성하기
-    starttime = time.time()
     protect0 = 0.33
-    name = sid.split('.')[-2]
+    model_name = sid.split('.')[-2]
     spk_item, protect0, _ = get_vc(sid, protect0, protect0)
     f0method0 = "rmvpe"
     filter_radius0 = 3
@@ -309,7 +308,8 @@ def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, backgr
 
     tgt_sr, audio_opt = vc_single(0, input_audio, vc_transform, f0_file, f0method0, file_index1, file_index2, index_rate, filter_radius0, resample_sr0, rms_mix_rate0, protect0['value'])
 
-    file_name = input_audio.split('/')[-1].split('.')[-2] + f"_{name}" + ".wav"
+    file_name = input_audio.split('/')[-1].split('.')[-2] + f"_{model_name}" + ".wav"
+    print(file_name)
     os.makedirs("./pyaicover/models/vocal_results", exist_ok=True)
 
     try:
@@ -318,13 +318,11 @@ def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, backgr
         print("저장에 실패했습니다.")
 
     vocal = AudioSegment.from_wav(f"./pyaicover/models/vocal_results/{file_name}")
+    vocal = vocal + 5  # 데시벨 조절
     instrumental = AudioSegment.from_wav(background_path)
 
     result = vocal.overlay(instrumental, position=0)
     os.makedirs("./pyaicover/models/merged_results", exist_ok=True)
-    result.export(f"./pyaicover/models/merged_results/{input_audio.split('/')[-2]}.wav", format="wav")
-
-    endtime = time.time()
-    print(f"저장에 성공했습니다. 소요시간: {endtime - starttime}")
+    result.export(f"./pyaicover/models/merged_results/{input_audio.split('/')[-2]}_{model_name}.mp3", format="mp3")
 
     return file_name
