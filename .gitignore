@@ -7,6 +7,7 @@ cms/AICover/pyaicover/__pycache__
 cms/AICover/pyaicover/TEMP
 
 cms/AICover/pyaicover/models/__pycache__
+cms/AICover/pyaicover/models/bin
 cms/AICover/pyaicover/models/datasets
 cms/AICover/pyaicover/models/logs
 cms/AICover/pyaicover/models/merged_results
@@ -20,3 +21,4 @@ cms/AICover/pyaicover/models/*.exe
 
 *.pyc
 __pycache__/
+.idea/
