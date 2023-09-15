@@ -71,6 +71,7 @@ gpu_info = ""
 if if_gpu_ok and len(gpu_infos) > 0:
     gpu_info = "\n".join(gpu_infos)
     default_batch_size = min(mem) // 2
+    print(default_batch_size)
 else:
     gpu_info = "사용 가능한 GPU가 없습니다."
     default_batch_size = 1

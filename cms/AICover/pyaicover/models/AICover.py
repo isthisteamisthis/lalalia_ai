@@ -305,7 +305,7 @@ def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, backgr
     rms_mix_rate0 = 0.25
 
     f0_file = ""
-
+    input_audio = input_audio.replace('\\', '/')
     tgt_sr, audio_opt = vc_single(0, input_audio, vc_transform, f0_file, f0method0, file_index1, file_index2, index_rate, filter_radius0, resample_sr0, rms_mix_rate0, protect0['value'])
 
     file_name = input_audio.split('/')[-1].split('.')[-2] + f"_{model_name}" + ".wav"
@@ -319,9 +319,23 @@ def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, backgr
 
     vocal = AudioSegment.from_wav(f"./pyaicover/models/vocal_results/{file_name}")
     vocal = vocal + 5  # 데시벨 조절
-    instrumental = AudioSegment.from_wav(background_path)
+    vocal = vocal.overlay(vocal-15, position=250)  # 에코 추가
 
-    result = vocal.overlay(instrumental, position=0)
+    try:
+        accompaniment = AudioSegment.from_wav(background_path + "accompaniment.wav")
+    except:
+        pass
+
+    bass = AudioSegment.from_wav(background_path + "bass.wav")
+    drums = AudioSegment.from_wav(background_path + "drums.wav")
+    other = AudioSegment.from_wav(background_path + "other.wav")
+    piano = AudioSegment.from_wav(background_path + "piano.wav")
+
+    r1 = vocal.overlay(bass, position=0)
+    r2 = r1.overlay(drums, position=0)
+    r3 = r2.overlay(other, position=0)
+    result = r3.overlay(piano, position=0)
+
     os.makedirs("./pyaicover/models/merged_results", exist_ok=True)
     result.export(f"./pyaicover/models/merged_results/{input_audio.split('/')[-2]}_{model_name}.mp3", format="mp3")
 
