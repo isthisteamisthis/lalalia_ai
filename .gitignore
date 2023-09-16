@@ -3,7 +3,9 @@ cms/AICover/pytrain
 cms/AICover/TEMP
 cms/AICover/*.pt
 
-cms/AICover/pyaicover/__pycache__
+cms/AICover/pyaicover/measurements
+cms/AICover/pyaicover/output
+cms/AICover/pyaicover/output_fft
 cms/AICover/pyaicover/TEMP
 
 cms/AICover/pyaicover/models/__pycache__

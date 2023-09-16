@@ -1,22 +1,28 @@
 import os, sys
 
+flask_dir = os.getcwd() + "\\pyaicover"
 model_dir = os.getcwd() + "\\pyaicover\\models"
+sys.path.append(flask_dir)
 sys.path.append(model_dir)
 
 from flask import Flask, render_template, jsonify, request
 from .models import AICover
+import measurements as me
+import sing
+
 import requests
 import shutil
 import time
-import librosa
 from pydub import AudioSegment
-import numpy as np
-import soundfile as sf
+from datetime import datetime
+
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = f'{flask_dir}\\mesurements'
 ALLOWED_EXTENSIONS = {'wav', 'mp3'}
+
+DATABASE_PATH = f"{model_dir}\\uploads.db"
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -29,145 +35,129 @@ NOTE_FREQUENCIES = {
     "도4": 261.63, "도#4": 277.18, 
 }
 
+# 사람이 낼 수 있는 최저Hz와 최고Hz
 MIN_HUMAN_FREQUENCY = 60
 MAX_HUMAN_FREQUENCY = 270
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+os.makedirs(f"{os.getcwd()}\\pyaicover\\output_fft", exist_ok=True)
 
-def frequency_to_note_and_octave(frequency):
-    # 문자열로 받은 frequency를 float로 변환
-    frequency = float(frequency)
-
-    # 주파수가 사람의 음성 범위를 벗어나면 범위 내에서 가장 가까운 주파수로 조정
-    if frequency < MIN_HUMAN_FREQUENCY:
-        frequency = MIN_HUMAN_FREQUENCY
-    elif frequency > MAX_HUMAN_FREQUENCY:
-        frequency = MAX_HUMAN_FREQUENCY
-
-    closest_note = min(NOTE_FREQUENCIES.keys(), key=lambda note: abs(frequency - NOTE_FREQUENCIES[note]))
-    note_name = closest_note[:-1]
-    octave = closest_note[-1]
-    return note_name, octave
-
-
-def get_freq_from_audio(audio_data, rate):
-    w = np.fft.fft(audio_data)
-    freqs = np.fft.fftfreq(len(w))
-    peak = np.argmax(np.abs(w))
-    
-    # Ensure that peak is within the range of freqs
-    if peak >= len(freqs):
-        peak = len(freqs) - 1
-
-    freq = freqs[peak]
-    freq_in_hertz = abs(freq * rate)
-    
-    # 주파수가 설정된 범위를 벗어나면 최소 또는 최대 값으로 설정
-    if freq_in_hertz < MIN_HUMAN_FREQUENCY:
-        freq_in_hertz = MIN_HUMAN_FREQUENCY
-    elif freq_in_hertz > MAX_HUMAN_FREQUENCY:
-        freq_in_hertz = MAX_HUMAN_FREQUENCY
-
-    freq_in_hertz = round(freq_in_hertz, 2)
-
-    return freq_in_hertz
-
-def analyze_high_frequency(file_path):
-    y, sr = librosa.load(file_path)
-    D = librosa.stft(y)
-    frequencies = librosa.fft_frequencies(sr=sr)
-    magnitude = np.abs(D)
-
-    human_voice_indices = np.where((frequencies >= MIN_HUMAN_FREQUENCY) & (frequencies <= MAX_HUMAN_FREQUENCY))
-    filtered_magnitudes = magnitude[human_voice_indices]
-
-    highest_index = np.argmax(np.max(filtered_magnitudes, axis=1))
-    highest_freq = round(frequencies[human_voice_indices][highest_index], 2)
-    return str(highest_freq)
-
-def analyze_low_frequency(file_path):
-    y, sr = librosa.load(file_path)
-    D = librosa.stft(y)
-    frequencies = librosa.fft_frequencies(sr=sr)
-    magnitude = np.abs(D)
-
-    human_voice_indices = np.where((frequencies >= MIN_HUMAN_FREQUENCY) & (frequencies <= MAX_HUMAN_FREQUENCY))
-    filtered_magnitudes = magnitude[human_voice_indices]
-
-    lowest_index = np.argmin(np.min(filtered_magnitudes, axis=1) + np.max(filtered_magnitudes))
-    lowest_freq = round(frequencies[human_voice_indices][lowest_index], 2)
-    return str(lowest_freq)
-
-
+### Flask 서버
 @app.route('/')
 def index():
     return render_template('index.html')
 
-def amplify_and_save(file_path):
-    y, sr = librosa.load(file_path, sr=None)
-    y = y * 2.0
-    # Avoid clipping
-    y = np.clip(y, -1.0, 1.0)
-    sf.write(file_path, y, sr)
-
+### 사용자 음역대 추출
 @app.route('/upload-high', methods=['POST'])
 def upload_high():
     file = request.files['file']
 
     print(file.filename)
-    file_name, file_extension = os.path.splitext(file.filename)
-    print("파일 이름:", file_name)
-    print("파일 확장자:", file_extension)
-    
-    nsfile_name = file_name.replace(' ', '_')
-    os.makedirs(model_dir + "\\measure", exist_ok=True)
-    print("폴더 생성")
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    measure_path = f'{model_dir}\\measure\\{nsfile_name}{file_extension}'
-    file.save(measure_path)
-    print("저장 성공")
+    filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(filename)
 
-    volume = AudioSegment.from_file(measure_path, format="mp4")
+    volume = AudioSegment.from_file(filename, format="mp4")
     volume = volume + 10
-    volume.export(measure_path, format='wav')
-        
-    print("불러오기")
-    amplify_and_save(measure_path)
-        
-    pitch = analyze_high_frequency(measure_path)
-    note, octave = frequency_to_note_and_octave(pitch)
+    volume.export(filename, format='wav')
+
+    pitch = me.analyze_high_frequency(filename)
+    note, octave = me.frequency_to_note_and_octave(pitch)
+
     return jsonify({"highestfrequency": str(pitch), "note": note, "octave": octave})
+
 
 @app.route('/upload-low', methods=['POST'])
 def upload_low():
     file = request.files['file']
 
     print(file.filename)
-    file_name, file_extension = os.path.splitext(file.filename)
-    print("파일 이름:", file_name)
-    print("파일 확장자:", file_extension)
-    
-    nsfile_name = file_name.replace(' ', '_')
-    os.makedirs(model_dir + "\\measure", exist_ok=True)
-    print("폴더 생성")
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    measure_path = f'{model_dir}\\measure\\{nsfile_name}{file_extension}'
-    file.save(measure_path)
-    print("저장 성공")
+    filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(filename)
 
-    volume = AudioSegment.from_file(measure_path, format="mp4")
+    volume = AudioSegment.from_file(filename, format="mp4")
     volume = volume + 10
-    volume.export(measure_path, format='wav')
-        
-    print("불러오기")
-    amplify_and_save(measure_path)
-        
-    pitch = analyze_low_frequency(measure_path)
-    note, octave = frequency_to_note_and_octave(pitch)
+    volume.export(filename, format='wav')
+
+    pitch = me.analyze_low_frequency(filename)
+    note, octave = me.frequency_to_note_and_octave(pitch)
+
     return jsonify({"lowestfrequency": str(pitch), "note": note, "octave": octave})
 
 
+@app.route('/get-recommendations')
+def get_recommendations():
+    highest_freq = request.get_json()['high']
+    lowest_freq = request.get_json()['low']
+    filenames = me.get_matching_filenames(highest_freq, lowest_freq)
+
+    return jsonify({"matchingfilenames": filenames})
+
+
+### 노래방 기능
+@app.route('/singasong', methods=['GET', 'POST'])
+def sing_song():
+    # 음원 분리
+    print("음원 로딩 중입니다...")
+    music = request.files['music']
+    nsfile_name, file_extension = sing.split_music(music)
+
+    vocal_path = f"{os.getcwd()}\\pyaicover\\output\\{nsfile_name}\\Vocals_{nsfile_name}{file_extension}"
+    MR_path = f"{os.getcwd()}\\pyaicover\\output\\{nsfile_name}\\MR_{nsfile_name}{file_extension}"
+
+    ref_samples, sr = sing.load_audio_file(vocal_path)
+    ref_segments = sing.find_audio_segments(ref_samples, sr)
+
+    print("음원 재생을 시작합니다.")
+    sing.play_audio(MR_path)
+
+    user_samples = sing.record_audio(len(ref_samples) / sr, sr)
+    user_segments = sing.find_audio_segments(user_samples, sr)
+    print("4단계 완료")
+
+    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    # 답지 노래 txt로 저장
+    with open(f"output_fft/{current_time}_reference.txt", "w") as ref_f:
+        for i, (ref_start, ref_end) in enumerate(ref_segments):
+            ref_pitch = sing.analyze_pitch_fft(ref_samples[ref_start:ref_end], sr)
+            ref_f.write(f"Segment {i+1}: Ref Start {ref_start}, Ref End {ref_end}, Ref Pitch {ref_pitch:.2f} Hz\n")
+
+    # 사용자가 부른 노래 저장
+    sing.save_audio(user_samples, sr, f'output_fft/{current_time}_user_song.wav')
+    print("5단계 완료")
+
+    total_score = 0
+    note_count = 0
+
+    with open(f"output_fft/{current_time}_user_evaluation.txt", "w") as f:
+        for i, (ref_start, ref_end) in enumerate(ref_segments):
+            ref_pitch = sing.analyze_pitch_fft(ref_samples[ref_start:ref_end], sr)
+            
+            for user_start, user_end in user_segments:
+                rhythm_evaluation, rhythm_score = sing.evaluate_rhythm(ref_start, ref_end, user_start, user_end)
+                
+                if rhythm_evaluation == "In-Sync":
+                    user_pitch = sing.analyze_pitch_fft(user_samples[user_start:user_end], sr)
+                    pitch_evaluation, pitch_score = sing.evaluate_pitch_fft(ref_pitch, user_pitch)
+                    
+                    ### 저장형식 변경 필요 ###
+                    # f.write(f"Segment {i+1}: Ref Start {ref_start}, Ref End {ref_end}, User Start {user_start}, User End {user_end}, Rhythm: {rhythm_evaluation}, Pitch: {pitch_evaluation}, Rhythm Score: {rhythm_score}, Pitch Score: {pitch_score}\n")
+                    f.write(f"Segment {i+1}: Ref Start {ref_start}, Ref End {ref_end}, User Start {user_start}, User End {user_end}, Ref Pitch {ref_pitch:.2f} Hz, User Pitch {user_pitch:.2f} Hz, Pitch: {pitch_evaluation}, Pitch Score: {pitch_score}\n")
+                    
+                    total_score += (pitch_score)  # 여기에 rhythm_score 추가 가능
+                    note_count += 1
+                    break
+
+        final_score = total_score / note_count if note_count > 0 else 0
+        f.write(f"\nFinal Score: {final_score:.2f}/100")
+
+    print(f"Final Score: {final_score:.2f}/100")
+
+
+### AI Cover 제작
 @app.route('/aicover', methods=['GET', 'POST'])
 def create_aicover():
     starttime = time.time()
@@ -184,9 +174,6 @@ def create_aicover():
     # 받은 음악 파일 저장
     print(music.filename)
     file_name, file_extension = os.path.splitext(music.filename)
-    print("파일 이름:", file_name)
-    print("파일 확장자:", file_extension)
-    
     nsfile_name = file_name.replace(' ', '_')
     os.makedirs(model_dir + "\\spleeter", exist_ok=True)
 
@@ -198,8 +185,6 @@ def create_aicover():
     music_path = f'{model_dir}\\spleeter\\{nsfile_name}{file_extension}'
     music.save(music_path)
 
-    print('기다려주세요.')
-
     # 음원 분리
     spl = f'spleeter separate -p spleeter:5stems -o pyaicover/models/spleeter {model_dir}\\spleeter\\{nsfile_name}{file_extension}'
     os.system(spl)
@@ -208,7 +193,6 @@ def create_aicover():
     if os.path.isfile(music_path):
         os.remove(music_path)
 
-    print("분리가 완료되었습니다.")
     print("폴더명:", nsfile_name)
     print("분리된 음원의 경로:", f"{model_dir}\\spleeter\\{nsfile_name}")
 
@@ -220,7 +204,7 @@ def create_aicover():
     file_name = AICover.make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, background_path)
     
     # 사용된 음원 삭제
-    # shutil.rmtree(f"{model_dir}\\spleeter\\{nsfile_name}", ignore_errors=True)
+    shutil.rmtree(f"{model_dir}\\spleeter\\{nsfile_name}", ignore_errors=True)
 
     # 서버로 완성된 AI Cover 전송
     print("전송을 시도합니다.")
@@ -233,6 +217,7 @@ def create_aicover():
     return f"AI Cover가 성공적으로 제작되었습니다. 소요시간 : {endtime-starttime}" 
 
 
+# 음성 모델 훈련
 @app.route('/aitrain', methods=['GET', 'POST'])
 def train_models():
     len = int(request.form['file_length'])
@@ -280,6 +265,7 @@ def train_models():
             shutil.rmtree(f"{model_dir}\\spleeter\\{nsfile_name}", ignore_errors=True)
 
         except:
+            print("오류 발생")
             return "오류가 발생했습니다."
         
 
