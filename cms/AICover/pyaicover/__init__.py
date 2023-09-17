@@ -87,13 +87,17 @@ def upload_low():
     return jsonify({"lowestfrequency": str(pitch), "note": note, "octave": octave})
 
 
-@app.route('/get-recommendations')
+@app.route('/get-recommendations', methods=['GET', 'POST'])
 def get_recommendations():
+    print("들어온 requests:", request.get_json())
     highest_freq = request.get_json()['high']
+    print("highest_freq:", highest_freq)
     lowest_freq = request.get_json()['low']
+    print("lowest_freq:", lowest_freq)
     filenames = me.get_matching_filenames(highest_freq, lowest_freq)
+    print("추천 음악:", filenames)
 
-    return jsonify({"matchingfilenames": filenames})
+    return filenames
 
 
 ### 노래방 기능
@@ -209,8 +213,8 @@ def create_aicover():
     # 서버로 완성된 AI Cover 전송
     print("전송을 시도합니다.")
     aicover = open(f"./pyaicover/models/merged_results/{input_audio.split('/')[-2]}_{model_name}.mp3", 'rb')
-    upload = {'perfect-score': aicover}
-    requests.post(' http://192.168.0.88:8080/api/perfect-scores', files = upload)
+    upload = {'file': aicover}
+    requests.post(' http://192.168.0.109:8080/api/created-song', files = upload)
     print("전송 완료")
     endtime = time.time()
 
@@ -272,7 +276,6 @@ def train_models():
     return "ok"
         
 
-        # AI Cover 생성
         # train_datasets = f"{model_dir}\\datasets"
         # train_name = request.form['model']  # 모델의 이름
         # total_epoch11 = request.form['epochs']  # epoch 수

@@ -8,6 +8,7 @@ import datetime
 
 hps = utils.get_hparams()  # python parser들을 가져온다.
 
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = hps.gpus.replace("-", ",")
 n_gpus = len(hps.gpus.split("-"))
 from random import shuffle, randint
@@ -539,7 +540,9 @@ def run(rank, n_gpus, hps):
 
 
 def main():
+    print('Current cuda device:', torch.cuda.current_device())
     n_gpus = torch.cuda.device_count()
+    print('Count of using GPUs:', n_gpus)
     if torch.cuda.is_available() == False and torch.backends.mps.is_available() == True:
         n_gpus = 1
 
