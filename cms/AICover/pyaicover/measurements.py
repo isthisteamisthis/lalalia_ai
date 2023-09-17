@@ -15,17 +15,16 @@ ALLOWED_EXTENSIONS = {'wav', 'mp3'}
 DATABASE_PATH = f"{os.getcwd()}\\pyaicover\\mesurements\\uploads.db"
 
 NOTE_FREQUENCIES = {
-    "라1": 55.00, "라#1": 58.27, "시1": 61.74,
-    "도2": 65.41, "도#2": 69.30, "레2": 73.42, "레#2": 77.78, "미2": 82.41, "파2": 87.31,
-    "파#2": 92.50, "솔2": 98.00, "솔#2": 103.83, "라2": 110.00, "라#2": 116.54, "시2": 123.47,
-    "도3": 130.81, "도#3": 138.59, "레3": 146.83, "레#3": 155.56, "미3": 164.81, "파3": 174.61,
-    "파#3": 185.00, "솔3": 196.00, "솔#3": 207.65, "라3": 220.00, "라#3": 233.08, "시3": 246.94,
-    "도4": 261.63, "도#4": 277.18, 
+    "도1": 80.00, "도#1": 84.85, "레1": 89.90, "레#1": 95.17, "미1": 100.67, "파1": 106.42, "파#1": 112.44, "솔1": 118.75, "솔#1": 125.37, "라1": 132.29, "라#1": 139.54, "시1": 147.16,
+    "도2": 160.00, "도#2": 169.71, "레2": 179.81, "레#2": 190.34, "미2": 201.34, "파2": 212.83, "파#2": 224.88, "솔2": 237.50, "솔#2": 250.74, "라2": 264.58, "라#2": 279.08, "시2": 294.33,
+    "도3": 320.00, "도#3": 339.42, "레3": 359.61, "레#3": 380.68, "미3": 402.68, "파3": 425.65, "파#3": 449.76, "솔3": 475.00, "솔#3": 501.48, "라3": 529.16, "라#3": 558.16, "시3": 588.66,
+    "도4": 640.00, "도#4": 678.83, "레4": 719.23, "레#4": 761.36, "미4": 805.36, "파4": 851.31, "파#4": 899.52, "솔4": 950.00, "솔#4": 1002.96, "라4": 1058.32, "라#4": 1116.32, "시4": 1177.32,
+    "도5": 1280.00
 }
 
 # 사람이 낼 수 있는 최저Hz와 최고Hz
-MIN_HUMAN_FREQUENCY = 60
-MAX_HUMAN_FREQUENCY = 270
+MIN_HUMAN_FREQUENCY = 80
+MAX_HUMAN_FREQUENCY = 1280
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -45,24 +44,34 @@ def frequency_to_note_and_octave(frequency):
     octave = closest_note[-1]
     return note_name, octave
 
+def overlap_length(a_start, a_end, b_start, b_end):
+    """
+    두 범위의 겹치는 부분의 길이를 반환합니다.
+    """
+    overlap_start = max(a_start, b_start)
+    overlap_end = min(a_end, b_end)
+    return max(0, overlap_end - overlap_start)
+
 def get_matching_filenames(highest_freq, lowest_freq):
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
-    # 사용자의 highest_freq가 DB의 highest_freq보다 작거나 같고,
-    # 사용자의 lowest_freq가 DB의 lowest_freq보다 크거나 같은 파일 이름 조회
+    # highest_freq와 lowest_freq 사이에 있는 파일 이름 조회
     cursor.execute("""
-    SELECT filename FROM uploads 
-    WHERE ? <= highst_freq AND ? >= lowest_freq
-    LIMIT 3
-    """, (highest_freq, lowest_freq))
+    SELECT filename, highest_freq, lowest_freq FROM uploads
+    """)
 
-    filenames = [row[0].replace('.wav', '') for row in cursor.fetchall()]  # .wav 확장자 제거
+    overlaps = []
+    for row in cursor.fetchall():
+        filename, file_high, file_low = row
+        overlap = overlap_length(lowest_freq, highest_freq, file_low, file_high)
+        overlaps.append((filename, overlap))
 
-    # 만약 결과가 없다면 임의로 3개의 파일 이름을 선택
-    if not filenames:
-        cursor.execute("SELECT filename FROM uploads LIMIT 3")
-        filenames = [row[0].replace('.wav', '') for row in cursor.fetchall()]  # .wav 확장자 제거
+    # 겹치는 길이가 큰 순서대로 정렬
+    sorted_overlaps = sorted(overlaps, key=lambda x: x[1], reverse=True)
+
+    # 상위 3개의 파일 이름만 추출
+    filenames = [item[0] for item in sorted_overlaps[:3]]
 
     conn.close()
     return filenames
