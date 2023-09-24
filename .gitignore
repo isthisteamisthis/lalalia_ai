@@ -1,5 +1,4 @@
 cms/AICover/pretrained_models
-cms/AICover/pytrain
 cms/AICover/TEMP
 cms/AICover/*.pt
 
@@ -50,3 +49,5 @@ cms/AICover/pyaitrain/models/*.exe
 *.pyc
 __pycache__/
 .idea/
+*.onnx
+*.pt
