@@ -14,15 +14,20 @@ from pydub import AudioSegment
 import shutil
 
 
+SEMITONES = ['C0', 'C#0', 'D0', 'D#0', 'E0', 'F0', 'F#0', 'G0', 'G#0', 'A0', 'A#0', 'B0',
+            'C1', 'C#1', 'D1', 'D#1', 'E1', 'F1', 'F#1', 'G1', 'G#1', 'A1', 'A#1', 'B1',
+            'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2',
+            'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3',
+            'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4',
+            'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5', 'A5', 'A#5', 'B5',
+            'C6', 'C#6', 'D6', 'D#6', 'E6', 'F6', 'F#6', 'G6', 'G#6', 'A6', 'A#6', 'B6',
+            'C7', 'C#7', 'D7', 'D#7', 'E7', 'F7', 'F#7', 'G7', 'G#7', 'A7', 'A#7', 'B7',
+            'C8', 'C#8', 'D8', 'D#8', 'E8', 'F8', 'F#8', 'G8']
+
 def split_music(music):
     file_name, file_extension = os.path.splitext(music.filename)
     nsfile_name = file_name.replace(' ', '_')
     os.makedirs(model_dir + "\\spleeter", exist_ok=True)
-
-    try:
-        os.rename(os.path.join(model_dir + "\\spleeter\\", file_name + file_extension), os.path.join(model_dir + "\\spleeter\\", nsfile_name + file_extension))
-    except FileNotFoundError:
-        pass
     
     music_path = f'{model_dir}\\spleeter\\{nsfile_name}{file_extension}'
     music.save(music_path)
@@ -57,6 +62,20 @@ def split_music(music):
 
     return nsfile_name, file_extension
 
+def pitch_to_note(pitch, base_frequency=440.0):
+    """주어진 피치를 서양 음악의 12음도에 해당하는 음계와 옥타브로 변환"""
+    if pitch == 0.0:
+        return "None"
+    index = round(12 * np.log2(pitch / base_frequency))
+    
+    # index 값이 음수일 때의 처리
+    while index < 0:
+        index += 12  # 12를 더해 음계를 한 옥타브 위로 올림
+    
+    octave = index // 12
+    note = SEMITONES[index % 12]
+    return f"{note[:-1]}{octave}"
+
 
 def load_audio_file(file_path):
     audio, sr = librosa.load(file_path, sr=None)
@@ -83,6 +102,7 @@ def find_audio_segments(samples, sr, threshold=0.01, min_duration=0.1):
 
 
 def play_audio(file_path):
+    pygame.mixer.pre_init(44100, 16, 2, 4096)
     pygame.mixer.init()
     pygame.mixer.music.load(file_path)
     pygame.mixer.music.play()
@@ -116,30 +136,21 @@ def save_audio(samples, sr, file_path):
     sf.write(file_path, samples, sr)
 
 
-### 음정 채점 기준 변경 필요 ###
-def evaluate_pitch_fft(reference, user):
-    # 평균율 pitch에서 한 음과 다음 음 사이의 주파수 비율
-    semitone_ratio = 2 ** (1 / 12)
-    
-    # 반음 위 아래로의 주파수 범위
-    upper_semitone = reference * semitone_ratio
-    lower_semitone = reference / semitone_ratio
-    
-    # 한 음 위 아래로의 주파수 범위
-    upper_whole_tone = reference * (semitone_ratio ** 2)
-    lower_whole_tone = reference / (semitone_ratio ** 2)
-    
-    if abs(reference - user) < 10:  # 10Hz 허용 오차
-        return "Perfect", 100
-    elif lower_semitone < user < upper_semitone:
-        return "Good", 80
-    elif lower_whole_tone < user < upper_whole_tone:
-        return "Normal", 60
-    else:
-        return "Bad", 40
+def evaluate_pitch_notes(reference, user):
+    try:
+        pitch_difference = SEMITONES.index(user) - SEMITONES.index(reference)
+        
+        if pitch_difference == 0:
+            return "Perfect", 100
+        elif abs(pitch_difference) <= 1:
+            return "Good", 80
+        elif abs(pitch_difference) <= 3:
+            return "Normal", 60
+        else:
+            return "Bad", 40
+    except:
+        return "None", 0
 
-
-### 박자 채점 변경 필요 ###
 def evaluate_rhythm(ref_start, ref_end, user_start, user_end):
     overlap_start = max(ref_start, user_start)
     overlap_end = min(ref_end, user_end)
@@ -148,9 +159,17 @@ def evaluate_rhythm(ref_start, ref_end, user_start, user_end):
     ref_duration = ref_end - ref_start
     overlap_ratio = overlap_duration / ref_duration
     
-    if overlap_ratio >= 0.9:  # 70% 이상 겹친다면
+    if overlap_ratio >= 0.9:
         return "In-Sync", 100
-    elif overlap_ratio >= 0.4:  # 40% 이상 겹친다면
+    elif overlap_ratio >= 0.4:
         return "Almost In-Sync", 70
     else:
         return "Out-of-Sync", 0
+
+def samples_to_time_str(samples_index, sr):
+    """샘플 인덱스를 MM:SS.mmm 형식의 문자열로 변환"""
+    seconds_total = samples_index / sr
+    minutes = int(seconds_total // 60)
+    seconds = int(seconds_total % 60)
+    milliseconds = int((seconds_total * 1000) % 1000)
+    return f"{minutes:02}:{seconds:02}.{milliseconds:03}"

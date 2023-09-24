@@ -2,22 +2,20 @@ import os
 import shutil
 import sys
 
-now_dir = os.getcwd() + "\\pyaicover\\models"
+model_dir = os.getcwd() + "\\pyaicover\\models"
+now_dir = os.getcwd()
+sys.path.append(model_dir)
 sys.path.append(now_dir)
 
+from pydub import AudioSegment
 import traceback
 import warnings
-
 import numpy as np
 import torch
-
 import logging
-
-
 import soundfile as sf
 from config import Config
 from fairseq import checkpoint_utils
-from i18n import I18nAuto
 from lib.infer_pack.models import (
     SynthesizerTrnMs256NSFsid,
     SynthesizerTrnMs256NSFsid_nono,
@@ -27,33 +25,19 @@ from lib.infer_pack.models import (
 from my_utils import load_audio
 from vc_infer_pipeline import VC
 
-import time
-from pydub import AudioSegment
-
 logging.getLogger("numba").setLevel(logging.WARNING)
 
-
-tmp = os.path.join(now_dir, "TEMP")
+tmp = os.path.join(model_dir, "TEMP")
 shutil.rmtree(tmp, ignore_errors=True)
 
-try:
-    shutil.rmtree(
-        "%s/runtime/Lib/site-packages/lib.infer_pack" % (now_dir), ignore_errors=True
-    )
-    shutil.rmtree("%s/runtime/Lib/site-packages/uvr5_pack" % (now_dir), ignore_errors=True)
-except:
-    pass
-
 os.makedirs(tmp, exist_ok=True)
-os.makedirs(os.path.join(now_dir, "logs"), exist_ok=True)
-os.makedirs(os.path.join(now_dir, "weights"), exist_ok=True)
+os.makedirs(os.path.join(model_dir, "logs"), exist_ok=True)
+os.makedirs(os.path.join(model_dir, "weights"), exist_ok=True)
 os.environ["TEMP"] = tmp
 warnings.filterwarnings("ignore")
 torch.manual_seed(114514)
 
-
 config = Config()
-i18n = I18nAuto()
 ngpu = torch.cuda.device_count()
 gpu_infos = []
 mem = []
@@ -105,9 +89,9 @@ def load_hubert():
 
     hubert_model.eval()
 
-weight_root = f"{now_dir}/weights"
-weight_uvr5_root = f"{now_dir}/uvr5_weights"
-index_root = f"{now_dir}/logs"
+weight_root = f"{model_dir}/weights"
+weight_uvr5_root = f"{model_dir}/uvr5_weights"
+index_root = f"{model_dir}/logs"
 names = []
 
 for name in os.listdir(weight_root):
@@ -125,23 +109,7 @@ for name in os.listdir(weight_uvr5_root):
     if name.endswith(".pth") or "onnx" in name:
         uvr5_names.append(name.replace(".pth", ""))
 
-# 0. sid, 음성모델, "hyungku_2.pth"
-# 1. spk_item, 0 >> spk_item, _, _ = get_vc((sid = 음성 모델 pth), protect0, protect0), 화자의 수?
-# 2. input_audio0, 음성변조 시킬파일 경로, "D:/User/user/vocal-remover/result/너에게 난 나에게 넌/Vocals_너에게 난 나에게 넌.wav"
-# 3. vc_transform0, 음성변조 옥타브, 2
-# 4. f0_file, 없어도 무방, 기본 F0 및 리포트 대체
-# 5. f0method0, 음높이 추출 알고리즘, rmvpe
-# 6. file_index1, 비워도 됨
-# 7. file_index2, 모델 이름과 동일한 폴더의 index 파일 자동 선택
-# # file_big_npy1,
-# 8. index_rate1, index 파일 참조 비율 : 높을수록 모델쪽의 발음/음정, 낮을수록 기존 보컬쪽의 발음/음정 중시, 0.75
-# (해당 수치의 경우 외국인이 한국어 노래를 부를때 낮춰야함. 안 그러면 어색해짐)
-# 9. filter_radius0, 3
-# 10. resample_sr0, 0
-# 11. rms_mix_rate0, 0.25
-# 12. protect0, 왜곡 방지, 0.33
 
-# 매개변수 12개 : 위에 있는 변수들과 1:1 매칭
 def vc_single(sid, input_audio_path, f0_up_key, f0_file, f0_method, file_index, file_index2, 
               index_rate, filter_radius, resample_sr, rms_mix_rate, protect): 
 
@@ -234,16 +202,6 @@ def get_vc(sid, to_return_protect0, to_return_protect1):
 
         return {"visible": False, "__type__": "update"}
 
-
-    # cpt의 key값 : ['weight', 'config', 'info', 'sr', 'f0', 'version']
-
-    # print(cpt['weight'])
-    # print(cpt['config'])  # [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [12, 10, 2, 2], 512, [24, 20, 4, 4], 109, 256, 48000]
-    # print(cpt['info']) # 6epoch
-    # print(cpt['sr']) # 48k
-    # print(cpt['f0']) # 1
-    # print(cpt['version']) # v2
-
     # weights 폴더 안에 있는 모델.pth 불러오기
     person = "%s/%s" % (weight_root, sid)
     print("loading %s" % person)
@@ -292,7 +250,7 @@ sr_dict = {"32k": 32000, "40k": 40000, "48k": 48000}
 
 
 
-def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, background_path):
+def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, background_audio):
     # 보컬 합성하기
     protect0 = 0.33
     model_name = sid.split('.')[-2]
@@ -308,8 +266,7 @@ def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, backgr
     input_audio = input_audio.replace('\\', '/')
     tgt_sr, audio_opt = vc_single(0, input_audio, vc_transform, f0_file, f0method0, file_index1, file_index2, index_rate, filter_radius0, resample_sr0, rms_mix_rate0, protect0['value'])
 
-    file_name = input_audio.split('/')[-1].split('.')[-2] + f"_{model_name}" + ".wav"
-    print(file_name)
+    file_name = input_audio.split('/')[-2] + f"_{model_name}.wav"
     os.makedirs("./pyaicover/models/vocal_results", exist_ok=True)
 
     try:
@@ -317,26 +274,15 @@ def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, backgr
     except:
         print("저장에 실패했습니다.")
 
-    vocal = AudioSegment.from_wav(f"./pyaicover/models/vocal_results/{file_name}")
-    vocal = vocal + 5  # 데시벨 조절
-    vocal = vocal.overlay(vocal-15, position=250)  # 에코 추가
+    rvc_vocal = AudioSegment.from_wav(f"./pyaicover/models/vocal_results/{file_name}")
+    rvc_vocal = rvc_vocal + 5  # 데시벨 조절
+    rvc_vocal = rvc_vocal.overlay(rvc_vocal-15, position=250)  # 에코 추가
 
-    try:
-        accompaniment = AudioSegment.from_wav(background_path + "accompaniment.wav")
-    except:
-        pass
+    background = AudioSegment.from_wav(background_audio)
 
-    bass = AudioSegment.from_wav(background_path + "bass.wav")
-    drums = AudioSegment.from_wav(background_path + "drums.wav")
-    other = AudioSegment.from_wav(background_path + "other.wav")
-    piano = AudioSegment.from_wav(background_path + "piano.wav")
-
-    r1 = vocal.overlay(bass, position=0)
-    r2 = r1.overlay(drums, position=0)
-    r3 = r2.overlay(other, position=0)
-    result = r3.overlay(piano, position=0)
-
+    result = background.overlay(rvc_vocal)
     os.makedirs("./pyaicover/models/merged_results", exist_ok=True)
-    result.export(f"./pyaicover/models/merged_results/{input_audio.split('/')[-2]}_{model_name}.mp3", format="mp3")
+    result_path = f"./pyaicover/models/merged_results/{file_name.split('_')[0]}_{model_name}.mp3"
+    result.export(result_path, format="mp3")
 
-    return file_name
+    return result_path
