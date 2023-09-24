@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주파수 분석</title>
+    <script>
+        function analyzeHigh() {
+            const fileInput = document.querySelector("#high-file");
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            fetch('/upload-high', {  // URL 수정
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector("#high-result").innerText = `${data.highestfrequency}, ${data.note}, ${data.octave}`;
+            });
+        }
+
+        function analyzeLow() {
+            const fileInput = document.querySelector("#low-file");
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            fetch('/upload-low', {  // URL 수정
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector("#low-result").innerText = `${data.lowestfrequency}, ${data.note}, ${data.octave}`;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>주파수 분석 결과</h1>
+    
+    <h2>최고 음 분석</h2>
+    <input type="file" id="high-file">
+    <button onclick="analyzeHigh()">분석</button>
+    <p id="high-result">-, -, -</p>
+    
+    <h2>최저 음 분석</h2>
+    <input type="file" id="low-file">
+    <button onclick="analyzeLow()">분석</button>
+    <p id="low-result">-, -, -</p>
+</body>
+</html>
