@@ -766,5 +766,5 @@ def determine_auto_chunks(chunks, gpu):
         chunk_set = 0
     else:
         chunk_set = int(chunks)
-                
+
     return chunk_set
