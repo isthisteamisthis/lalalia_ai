@@ -1,4 +1,3 @@
-import argparse
 import sys
 import torch
 from multiprocessing import cpu_count
@@ -29,35 +28,6 @@ class Config:
         self.noautoopen = False
         self.x_pad, self.x_query, self.x_center, self.x_max = self.device_config()
 
-    # @staticmethod
-    # def arg_parse() -> tuple:
-    #     exe = sys.executable or "python"
-    #     parser = argparse.ArgumentParser()
-    #     parser.add_argument("--port", type=int, default=5000, help="Listen port")
-    #     parser.add_argument("--pycmd", type=str, default=exe, help="Python command")
-    #     parser.add_argument("--colab", action="store_true", help="Launch in colab")
-    #     parser.add_argument(
-    #         "--noparallel", action="store_true", help="Disable parallel processing"
-    #     )
-    #     parser.add_argument(
-    #         "--noautoopen",
-    #         action="store_true",
-    #         help="Do not open in browser automatically",
-    #     )
-    #     cmd_opts = parser.parse_args()
-
-    #     cmd_opts.port = cmd_opts.port if 0 <= cmd_opts.port <= 65535 else 5000
-
-    #     return (
-    #         cmd_opts.pycmd,
-    #         cmd_opts.port,
-    #         cmd_opts.colab,
-    #         cmd_opts.noparallel,
-    #         cmd_opts.noautoopen,
-    #     )
-
-    # has_mps is only available in nightly pytorch (for now) and MasOS 12.3+.
-    # check `getattr` and try it for compatibility
     @staticmethod
     def has_mps() -> bool:
         if not torch.backends.mps.is_available():
@@ -79,11 +49,9 @@ class Config:
                 or "1070" in self.gpu_name
                 or "1080" in self.gpu_name
             ):
-                # print("Found GPU", self.gpu_name, ", force to fp32")
                 self.is_half = False
                 use_fp32_config()
             else:
-                # print("Found GPU", self.gpu_name)
                 pass
             self.gpu_mem = int(
                 torch.cuda.get_device_properties(i_device).total_memory
@@ -112,13 +80,11 @@ class Config:
             self.n_cpu = cpu_count()
 
         if self.is_half:
-            # 6G显存配置
             x_pad = 3
             x_query = 10
             x_center = 60
             x_max = 65
         else:
-            # 5G显存配置
             x_pad = 1
             x_query = 6
             x_center = 38
