@@ -276,7 +276,10 @@ def make_AICover(sid, vc_transform, input_audio, file_index2, index_rate, backgr
 
     rvc_vocal = AudioSegment.from_wav(f"./pyaicover/models/vocal_results/{file_name}")
     rvc_vocal = rvc_vocal + 3  # 데시벨 조절
-    rvc_vocal = rvc_vocal.overlay(rvc_vocal-15, position=250)  # 에코 추가
+    echo1 = rvc_vocal - 12
+    echo2 = rvc_vocal - 15
+    rvc_vocal = rvc_vocal.overlay(echo1, position=125)
+    rvc_vocal = rvc_vocal.overlay(echo2, position=250)  # 에코 추가
 
     background = AudioSegment.from_wav(background_audio)
 
