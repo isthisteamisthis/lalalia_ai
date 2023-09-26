@@ -1,194 +1,3 @@
-# absl-py==1.4.0
-# aiohttp==3.8.5
-# aiosignal==1.3.1
-# altair==5.1.1
-# annotated-types==0.5.0
-# antlr4-python3-runtime==4.8
-# anyio==3.7.1
-# asttokens @ file:///home/conda/feedstock_root/build_artifacts/asttokens_1694046349000/work
-# astunparse==1.6.3
-# async-timeout==4.0.3
-# attrs==23.1.0
-# audioread==3.0.0
-# backcall @ file:///home/conda/feedstock_root/build_artifacts/backcall_1592338393461/work
-# backports.functools-lru-cache @ file:///home/conda/feedstock_root/build_artifacts/backports.functools_lru_cache_1687772187254/work
-# beautifulsoup4==4.12.2
-# bitarray==2.8.1
-# bleach==6.0.0
-# blinker==1.6.2
-# Brotli==1.0.9
-# cachetools==5.3.1
-# certifi==2022.12.7
-# cffi==1.15.1
-# charset-normalizer==2.1.1
-# click==8.1.7
-# colorama @ file:///home/conda/feedstock_root/build_artifacts/colorama_1666700638685/work
-# comm @ file:///home/conda/feedstock_root/build_artifacts/comm_1691044910542/work
-# contourpy==1.1.0
-# cycler==0.11.0
-# Cython==3.0.0
-# debugpy @ file:///D:/bld/debugpy_1694118017419/work
-# decorator @ file:///home/conda/feedstock_root/build_artifacts/decorator_1641555617451/work
-# defusedxml==0.7.1
-# exceptiongroup @ file:///home/conda/feedstock_root/build_artifacts/exceptiongroup_1692026125334/work
-# executing @ file:///home/conda/feedstock_root/build_artifacts/executing_1667317341051/work
-# fairseq==0.12.2
-# faiss==1.7.4
-# faiss-cpu==1.7.3
-# fastapi==0.103.1
-# fastjsonschema==2.18.0
-# ffmpeg==1.4
-# ffmpeg-python==0.2.0
-# ffmpy==0.3.1
-# filelock==3.9.0
-# Flask==2.3.3
-# flatbuffers==1.12
-# fonttools==4.42.1
-# frozenlist==1.4.0
-# fsspec==2023.9.0
-# future==0.18.3
-# gast==0.4.0
-# google-auth==2.22.0
-# google-auth-oauthlib==0.4.6
-# google-pasta==0.2.0
-# gradio==3.14.0
-# grpcio==1.58.0
-# h11==0.12.0
-# h2==4.1.0
-# h5py==3.9.0
-# hpack==4.0.0
-# httpcore==0.13.7
-# httpx==0.19.0
-# hydra-core==1.0.7
-# hyperframe==6.0.1
-# idna==3.4
-# importlib-metadata @ file:///home/conda/feedstock_root/build_artifacts/importlib-metadata_1688754491823/work
-# ipykernel @ file:///D:/bld/ipykernel_1693880431923/work
-# ipython @ file:///D:/bld/ipython_1693579916565/work
-# itsdangerous==2.1.2
-# jedi @ file:///home/conda/feedstock_root/build_artifacts/jedi_1690896916983/work
-# Jinja2==3.1.2
-# joblib==1.3.2
-# json5==0.9.14
-# jsonschema==4.19.0
-# jsonschema-specifications==2023.7.1
-# jupyter_client==8.3.0
-# jupyter_core==5.3.1
-# jupyterlab-pygments==0.2.2
-# keras==2.9.0
-# Keras-Preprocessing==1.1.2
-# kiwisolver==1.4.5
-# lapx==0.5.4
-# libclang==16.0.6
-# librosa==0.9.1
-# linkify-it-py==2.0.2
-# llvmlite==0.39.0
-# lxml==4.9.3
-# Markdown==3.4.4
-# markdown-it-py==3.0.0
-# MarkupSafe==2.1.3
-# matplotlib==3.7.2
-# matplotlib-inline @ file:///home/conda/feedstock_root/build_artifacts/matplotlib-inline_1660814786464/work
-# mdit-py-plugins==0.4.0
-# mdurl==0.1.2
-# mistune==3.0.1
-# mpmath==1.2.1
-# multidict==6.0.4
-# mutagen==1.46.0
-# nbclient==0.8.0
-# nbformat==5.9.2
-# nest-asyncio @ file:///home/conda/feedstock_root/build_artifacts/nest-asyncio_1664684991461/work
-# networkx==3.0
-# norbert==0.2.1
-# numba==0.56.4
-# numpy==1.23.5
-# oauthlib==3.2.2
-# omegaconf==2.0.6
-# opt-einsum==3.3.0
-# orjson==3.9.7
-# packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1681337016113/work
-# pandas==1.5.3
-# pandocfilters==1.5.0
-# parso @ file:///home/conda/feedstock_root/build_artifacts/parso_1638334955874/work
-# pickleshare @ file:///home/conda/feedstock_root/build_artifacts/pickleshare_1602536217715/work
-# Pillow==9.3.0
-# platformdirs==3.10.0
-# pooch==1.7.0
-# portalocker==2.7.0
-# praat-parselmouth==0.4.3
-# prompt-toolkit @ file:///home/conda/feedstock_root/build_artifacts/prompt-toolkit_1688565951714/work
-# protobuf==3.20.3
-# psutil @ file:///D:/bld/psutil_1681775154843/work
-# pure-eval @ file:///home/conda/feedstock_root/build_artifacts/pure_eval_1642875951954/work
-# pyasn1==0.5.0
-# pyasn1-modules==0.3.0
-# pycparser==2.21
-# pycryptodome==3.18.0
-# pycryptodomex==3.18.0
-# pydantic==2.3.0
-# pydantic_core==2.6.3
-# pydub==0.25.1
-# Pygments==2.16.1
-# pyparsing==3.0.9
-# python-dateutil==2.8.2
-# python-multipart==0.0.6
-# pytz==2023.3.post1
-# pywin32==306
-# pyworld==0.3.4
-# PyYAML==6.0.1
-# pyzmq==25.1.1
-# referencing==0.30.2
-# regex==2023.8.8
-# requests==2.28.1
-# requests-oauthlib==1.3.1
-# resampy==0.4.2
-# rfc3986==1.5.0
-# rpds-py==0.9.2
-# rsa==4.9
-# sacrebleu==2.3.1
-# scikit-learn==1.3.0
-# scipy==1.9.3
-# six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
-# sniffio==1.3.0
-# soundfile==0.12.1
-# soupsieve==2.4.1
-# spleeter==2.4.0
-# stack-data @ file:///home/conda/feedstock_root/build_artifacts/stack_data_1669632077133/work
-# starlette==0.27.0
-# sympy==1.11.1
-# tabulate==0.9.0
-# tensorboard==2.9.1
-# tensorboard-data-server==0.6.1
-# tensorboard-plugin-wit==1.8.1
-# tensorflow==2.9.3
-# tensorflow-estimator==2.9.0
-# tensorflow-io-gcs-filesystem==0.31.0
-# termcolor==2.3.0
-# threadpoolctl==3.2.0
-# tinycss2==1.2.1
-# toolz==0.12.0
-# torch==2.0.1+cu118
-# torchaudio==2.0.2+cu118
-# torchcrepe==0.0.20
-# torchvision==0.15.2+cu118
-# tornado==6.3.3
-# tqdm==4.66.1
-# traitlets==5.9.0
-# typer==0.3.2
-# typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1688315532570/work
-# tzdata==2023.3
-# uc-micro-py==1.0.2
-# urllib3==1.26.13
-# uvicorn==0.23.2
-# wcwidth @ file:///home/conda/feedstock_root/build_artifacts/wcwidth_1673864653149/work
-# webencodings==0.5.1
-# websockets==11.0.3
-# Werkzeug==2.3.7
-# wrapt==1.15.0
-# yarl==1.9.2
-# yt-dlp==2023.7.6
-# zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1689374466814/work
-
 joblib>=1.1.0
 numba==0.56.4
 numpy==1.23.5
@@ -236,5 +45,49 @@ fastapi==0.88
 ffmpy==0.3.1
 python-dotenv>=1.0.0
 av
+altgraph==0.17.3
+audioread==3.0.0
+certifi==2022.12.7
+cffi==1.15.1
+cryptography==3.4.6
+diffq==0.2.3
+Dora==0.0.3
+einops==0.6.0
+future==0.18.2
+julius==0.2.7
+kthread==0.2.3
+librosa==0.9.2
+llvmlite==0.39.1
+matchering==2.0.6
+ml_collections==0.1.1
+natsort==8.2.0
+numpy==1.23.4
+omegaconf==2.2.3
+opencv-python==4.6.0.66
+onnx
+onnxruntime==1.13.1
+Pillow==9.3.0
+pip==22.2.2
+playsound==1.3.0
+psutil==5.9.4
+pydub==0.25.1
+pyglet==1.5.23
+pyperclip==1.8.2
+pyrubberband==0.3.0
+pytorch_lightning==2.0.0
+PyYAML==6.0
+resampy==0.2.2
+scipy==1.9.3
+soundfile==0.11.0
+soundstretch==1.2
+torch==1.9.0+cu111
+tqdm
+urllib3==1.26.12
+wget==3.2
+samplerate==0.1.0
+screeninfo==0.8.1
+PySoundFile==0.9.0.post1; sys_platform != 'windows'
+SoundFile==0.9.0; sys_platform == 'windows'
+flask
 sounddevice
 pygame
