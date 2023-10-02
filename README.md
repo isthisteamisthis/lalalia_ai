@@ -1,6 +1,6 @@
 <div align="center">
   
-## 💽 랄라리아 : LALALIA (BackEnd)
+## 💽 랄라리아 : LALALIA (AI)
 <img width="330" alt="image" src="https://github.com/isthisteamisthis/.github/assets/119282494/8e02f14a-df51-469b-ae4c-01a76b61154a">
 <br>
 
