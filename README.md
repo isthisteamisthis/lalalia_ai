@@ -47,6 +47,10 @@
 # 주요 내용
 
 ### 🎤 음역대 측정 기능
+<img width="250" alt="image" src="https://github.com/isthisteamisthis/.github/assets/119282494/86a15008-ad16-407d-80b2-aacb593f1c9d">
+<img width="250" alt="image" src="https://github.com/isthisteamisthis/.github/assets/119282494/431e2f38-fd51-4d05-8b12-d9d5c3a01ee8">
+<br>
+
 - 서버로부터 클라이언트에서 측정한 최고음과 최저음을 전송받아 NOTE_FREQUENCIES에 따른 음역대를 추출
 - 추출한 음역대를 바탕으로 sqlite db에서 음역대에 가장 많이 겹쳐있는 노래를 랜덤하게 3개 추천
 - db에 저장된 노래들 역시 전부 최고음과 최저음 음역대를 추출
@@ -56,7 +60,10 @@
 - 사용자의 녹음과 보컬의 pitch를 비교해 기준범위(2**(1/12))에 따라 음의 차이를 분석 후 점수화
 
 ### 🎤 AI Cover 제작
-
+- 서버에서 변환할 노래, 모델명, 옥타브, 참조율을 받아 변환 작업을 실행
+- 변환할 노래의 보컬과 백그라운드를 분리 후, 옥타브와 참조율을 적용한 모델을 이용해 보컬을 변환
+- 변환한 보컬과 분리했던 백그라운드 합친 후 서버로 리턴
+- 목소리 모델의 경우 서버에서 사용자의 녹음과 원하는 epoch에 따라 train 진행
 
 # 기술 스택
 
