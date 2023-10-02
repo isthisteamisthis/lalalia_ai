@@ -58,13 +58,23 @@
 # 기술 스택
 
 ### 언어
+![Python](https://img.shields.io/badge/python-3776AB?style=flat&logo=python&logoColor=white)
 
 ### 주요 라이브러리
+![FFmpeg](https://img.shields.io/badge/FFmpeg-007808?style=flat&logo=FFmpeg&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=Flask&logoColor=white)
+![librosa](https://img.shields.io/badge/librosa-7f03a8?style=flat&logo=librosa&logoColor=white)
+![Pytorch](https://img.shields.io/badge/Pytorch-EE4C2C?style=flat&logo=Pytorch&logoColor=white)
+![spleeter](https://img.shields.io/badge/spleeter-0aa07b?style=flat&logo=spleeter&logoColor=white)
+![scikitlearn](https://img.shields.io/badge/scikitlearn-F7931E?style=flat&logo=scikitlearn&logoColor=white)
+![sqlite](https://img.shields.io/badge/sqlite-003857?style=flat&logo=sqlite&logoColor=white)
 
 ### 개발 툴
+![visualstudiocode](https://img.shields.io/badge/visualstudiocode-007ACC?style=flat&logo=visualstudiocode&logoColor=white)
 
 ### 협업 툴
-
+![Notion](https://img.shields.io/badge/notion-000000?style=flat&logo=notion&logoColor=white)
+![Discord](https://img.shields.io/badge/discord-5865F2?style=flat&logo=discord&logoColor=white)
 
 # 참고 자료
 ### 오픈소스(github)
