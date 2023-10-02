@@ -1,29 +1,83 @@
-# 프로젝트명
+<div align="center">
+  
+## 💽 랄라리아 : LALALIA (BackEnd)
+<img width="330" alt="image" src="https://github.com/isthisteamisthis/.github/assets/119282494/8e02f14a-df51-469b-ae4c-01a76b61154a">
+<br>
 
-### 🎙️ 랄라리아 (메타버스 아카데미 2기 융합팀 9월 월말평가 팀 프로젝트)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fcca-ffodregamdi%2Frunning-hi-back&count_bg=%23FFA49F&title_bg=%24555555&icon=&icon_color=%24E7E7E7&title=views&edge_flat=false)](https://hits.seeyoufarm.com)
 
-# 팀원 소개 및 역할
+</div>
+<br>
 
-### 👥 AI 개발 팀원
-- 메타버스 아카데미 2기 AI반 차민수, 이소영, 여형구 총 3명
+<br>
 
-### 👥 역할 분담
-- 주제 선정 : 모든 팀원 토의 및 강사/멘토님 협조
-- 음역대 측정 및 노래 추천 : 여형구
-- 노래방 점수 측정 : 이소영
-- AI Cover 제작 : 차민수
-- flask 서버 통신 : 모든 팀원
-- 코드 병합 : 차민수
+### 🎤 프로젝트, LALALIA
+>  **직접 제작한 곡이 세상에 불려지길 원하는 당신을 위해,** <br>
+>  **목소리를 세상에 알리고 싶은 당신을 위해 준비했습니다.** <br>
+>  **랄라리아는 커뮤니티 기반의 커버 노래 공유 & 매칭 플랫폼입니다.**
 
-- AI 파트 PPT 작성 : 모든 팀원
+<br>
+<br>
+
+
+### 🎤 주요 기능 소개
+> #### 1️⃣ **본인의 음역대를 찾아주는 기능**
+> **가수 지망생**으로 어플에 진입하면, 본인이 낼 수 있는 명확한 음역대에 맞는 노래를 추천받을 수 있습니다. <br>
+> **작곡가**로 어플에 진입하게 되면, 본인이 작곡한 노래의 음역대를 명시하여 본인의 노래를 불러줄 가수 지망생을 찾을 수 있습니다.
+
+<br>
+
+> #### 2️⃣ **뮤직 스코어 기능**
+> 뮤직 스코어 기능을 통해 가수 지망생은 해당 노래의 가수의 스타일에 더욱 근접할 수 있도록 연습할 수 있습니다.
+
+<br>
+
+> #### 3️⃣ **AI 커버 기능**
+> 가수 지망생은, 노래 실력이 성장한 자신을 직접 마주할 수 있으며, <br>
+> 작곡가는 유명인의 목소리를 합성해 들어봄으로서 본인의 노래에 어울리는 음색을 찾을 수 있습니다. <br>
+
+<br>
+
+<br>
+
+# 👥 AI 개발 팀원 소개 
+
+<table>
+  <tr>
+    <td align="center"><a href=""><img src="https://avatars.githubusercontent.com/llleeeso" width="150px;" alt="">
+    <td align="center"><a href=""><img src="https://avatars.githubusercontent.com/wohoman" width="150px;" alt="">
+    <td align="center"><a href="https://github.com/MinSooC"><img src="https://avatars.githubusercontent.com/MinSooC" width="150px;" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><strong>AI</strong></td>
+    <td align="center"><strong>AI</strong></td>
+    <td align="center"><strong>AI</strong></td>
+  </tr>
+      
+  <tr>
+    <td align="center"><a href="https://github.com/llleeeso"><b>이소영</b></td>
+    <td align="center"><a href="https://github.com/wohoman"><b>여형구</b></td>
+    <td align="center"><a href="https://github.com/MinSooC"><b>차민수</b></td>
+  </tr>
+
+  <tr>
+    <td align="center">뮤직 스코어 점수 기능 구현</td>
+    <td align="center">음역대 측정 및 음악 추천 기능 구현</td>
+    <td align="center">AI 데모곡 제작 및 flask 통신 기능 구현</td>
+  </tr>
+</table>
+<br>
+
+<br>
 
 # 프로젝트 진행 기록
 
 ### 기간
-- 2023.09.04 ~ 2023.09.27
+- 2023.09.06 ~ 2023.09.26
 
 ### 세부내용
-- 23.09.04 ~ 23.09.06 : 주제 선정 및 발표 PPT 제작
+- 23.09.06 : 주제 선정 및 발표 PPT 제작
 - 23.09.07 : 주제 발표, 최고음/최저음 음역대 측정, 노래 주파수 추출, 음원의 Vocal과 MR 분리 작업
 - 23.09.08 : 최고음/최저음 음역대 측정, 노래 주파수 추출, 음원의 Vocal과 MR 분리 작업, 음원 합성 코드 작업
 - 23.09.09 ~ 23.09.10 : 음성 모델 훈련에 사용할 데이터 생성 및 수집
